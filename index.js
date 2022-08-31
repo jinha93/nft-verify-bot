@@ -15,7 +15,8 @@ const app = express();
 
 app.get('/', async ({ query }, response) => {
 	const { code } = query;
-	let id = "";
+	let access_token = "";
+	let token_type = "";
 
 	if (code) {
 		try {
@@ -37,16 +38,8 @@ app.get('/', async ({ query }, response) => {
 			const oauthData = await getJSONResponse(tokenResponseData.body);
 			console.log(oauthData);
 
-			const userResult = await request('https://discord.com/api/users/@me', {
-				headers: {
-					authorization: `${oauthData.token_type} ${oauthData.access_token}`,
-				},
-			});
-			const userData = await getJSONResponse(userResult.body);
-			console.log(userData);
-			console.log(userData.id);
-			id = userData.id;
-			response.set("id",id);
+			access_token = oauthData.access_token;
+			token_type = oauthData.token_type;
 
 		} catch (error) {
 			// NOTE: An unauthorized token will not throw an error
@@ -54,6 +47,10 @@ app.get('/', async ({ query }, response) => {
 			console.error(error);
 		}
 	}
+
+	response.redirect(`/LimeLight#access_token=${access_token}&token_type=${token_type}`)
+});
+app.get('/LimeLight', async ({ query }, response) => {
 	return response.sendFile('index.html', { root: '.' });
 });
 app.listen(port, () => console.log(`App listening at http://localhost:${port}`));
