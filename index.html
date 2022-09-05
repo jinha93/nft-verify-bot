@@ -1,5 +1,33 @@
-<div id="info">Hoi!</div>
-<a id="login" style="display: none;" href="https://discord.com/api/oauth2/authorize?client_id=1013978366287810580&redirect_uri=http%3A%2F%2Flocalhost%3A53134&response_type=code&scope=identify">Identify Yourself</a>
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Document</title>
+	</head>
+	<body>
+		<div>
+			<a href="https://discord.com/api/oauth2/authorize?client_id=1013978366287810580&redirect_uri=http%3A%2F%2F59.26.189.126%3A53134&response_type=code&scope=identify">인증링크</a>
+		</div>
+		<button id="btn_wallet" onclick="onClick()">지갑 연동 하기</button>
+		<div>
+			<div>지갑주소:</div>
+			<div id="wallet_addr"></div>
+		</div>
+		<div>
+			<div>NFT 보유수:</div>
+			<div id="nft_count"></div>
+		</div>
+		<a id="login" style="display: none" href="your-oauth2-URL-here"
+			>Identify Yourself</a
+		>
+		<button id="btn_discord_connect" disabled onclick="onDiscordConnect()">
+			디스코드와 지갑 연결
+		</button>
+	</body>
+</html>	
+
 <script>
 	window.onload = () => {
 		const fragment = new URLSearchParams(window.location.hash.slice(1));
@@ -17,8 +45,68 @@
 			.then(result => result.json())
 			.then(response => {
 				const { username, discriminator } = response;
-				document.getElementById('info').innerText += ` ${username}#${discriminator}`;
+				console.log(response);
+				discord_user_id = response.id;
+				//document.getElementById('info').innerText += ` ${username}#${discriminator}`;
 			})
 			.catch(console.error);
 	};
+
+	let wallet_addr = null;
+    let discord_user_id = null;
+
+    async function onDiscordConnect() {
+		console.log("onDiscordConnect");
+
+		const url = "/api_discord_connect";
+
+		const res = await fetch(url, {
+			method: "POST",
+			headers: {
+				"Content-Type": "application/json",
+			},
+			body: JSON.stringify({
+				wallet_addr,
+				discord_user_id
+			}),
+		});
+		const resData = await res.json();
+		console.log("resData", resData);
+
+		alert("홀더 인증이 완료되었습니다.\n디스코드를 확인해주세요.");
+	}
+
+	async function onClick() {
+        console.log("onClick");
+
+        let addr = null;
+        try {
+          const accounts = await window.klaytn.enable();
+          console.log("accounts", accounts);
+          addr = accounts[0];
+        } catch (err) {
+          console.log("accounts err", err);
+          return;
+        }
+
+        wallet_addr = addr;
+        document.getElementById("wallet_addr").innerText = addr;
+
+        const url = "/api_wallet";
+        const res = await fetch(url, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            addr: addr,
+          }),
+        });
+        const resData = await res.json();
+        console.log("resData", resData);
+
+        document.getElementById("nft_count").innerText = resData.count;
+        document.getElementById("btn_discord_connect").disabled = false;
+        document.getElementById("btn_wallet").disabled = true;
+      }
 </script>

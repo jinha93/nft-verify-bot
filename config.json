@@ -1,5 +1,7 @@
 {
 	"clientId": "1013978366287810580",
-	"clientSecret": "5mh5cylWmxQZ2YY1XnFvLd_J1sv9xzg7",
-	"port": 53134
+	"clientSecret": "7fkrXW1piR801kf-dRrQk7Shw4I6x-S5",
+	"port": 53134,
+	"token": "MTAxMzk3ODM2NjI4NzgxMDU4MA.GAu-lv.r8HUla9bRdb3IBT_qoDIkP-9ZRtatpVgNJOspk",
+	"url": "https://discord.com/api/oauth2/authorize?client_id=1013978366287810580&redirect_uri=http%3A%2F%2F59.26.189.126%3A53134&response_type=code&scope=identify"
 }
